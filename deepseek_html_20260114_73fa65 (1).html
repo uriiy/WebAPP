@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bluetooth Сканер устройств</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .bluetooth-status {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .status-available {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-unavailable {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status-scanning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+
+        .buttons-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 180px;
+            font-weight: bold;
+        }
+
+        .primary-btn {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .primary-btn:hover:not(:disabled) {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .secondary-btn {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        .secondary-btn:hover:not(:disabled) {
+            background-color: #27ae60;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .danger-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .danger-btn:hover:not(:disabled) {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .devices-container {
+            margin-top: 30px;
+        }
+
+        .devices-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .devices-count {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+
+        .devices-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .device-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+
+        .device-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .device-item:last-child {
+            border-bottom: none;
+        }
+
+        .device-info {
+            flex-grow: 1;
+        }
+
+        .device-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+
+        .device-id {
+            font-family: monospace;
+            font-size: 12px;
+            color: #7f8c8d;
+            word-break: break-all;
+        }
+
+        .connect-btn {
+            padding: 8px 16px;
+            background-color: #9b59b6;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .connect-btn:hover:not(:disabled) {
+            background-color: #8e44ad;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #95a5a6;
+        }
+
+        .log-container {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        .log-entry {
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .log-time {
+            color: #7f8c8d;
+            margin-right: 10px;
+        }
+
+        .log-info {
+            color: #3498db;
+        }
+
+        .log-success {
+            color: #27ae60;
+        }
+
+        .log-error {
+            color: #e74c3c;
+        }
+
+        .log-warning {
+            color: #f39c12;
+        }
+
+        .scan-options {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .scan-options h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .option-group {
+            margin-bottom: 15px;
+        }
+
+        .option-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .option-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .scan-info {
+            background-color: #e3f2fd;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            border-left: 4px solid #2196f3;
+        }
+
+        .bluetooth-icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background-color: #3498db;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M14.88 16.29L13 18.17v-3.76m0-8.58l1.88 1.88L13 9.58m4.71-1.87L12 2h-1v7.58L6.41 5 5 6.41 10.59 12 5 17.58 6.41 19 11 14.41V22h1l5.71-5.71-4.3-4.29z'/%3E%3C/svg%3E") no-repeat center;
+            -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M14.88 16.29L13 18.17v-3.76m0-8.58l1.88 1.88L13 9.58m4.71-1.87L12 2h-1v7.58L6.41 5 5 6.41 10.59 12 5 17.58 6.41 19 11 14.41V22h1l5.71-5.71-4.3-4.29z'/%3E%3C/svg%3E") no-repeat center;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        .device-connected .bluetooth-icon {
+            background-color: #2ecc71;
+            animation: pulse 2s infinite;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+
+            .buttons-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            button {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .device-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .connect-btn {
+                margin-top: 10px;
+                align-self: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><span class="bluetooth-icon"></span> Bluetooth Сканер устройств</h1>
+
+        <div id="bluetoothStatus" class="bluetooth-status">
+            Проверяем доступность Bluetooth...
+        </div>
+
+        <div class="scan-info">
+            <strong>Информация:</strong> Это приложение сканирует BLE (Bluetooth Low Energy) устройства. 
+            Для работы необходим браузер с поддержкой Web Bluetooth API (Chrome 56+, Edge 79+, Opera 43+).
+        </div>
+
+        <div class="scan-options">
+            <h3>Настройки сканирования</h3>
+            <div class="option-group">
+                <label for="serviceFilter">Фильтр по сервисам:</label>
+                <select id="serviceFilter">
+                    <option value="all">Все устройства</option>
+                    <option value="battery">Устройства с батареей</option>
+                    <option value="health">Устройства здоровья</option>
+                    <option value="heart_rate">Пульсометры</option>
+                    <option value="cycling">Велокомпьютеры</option>
+                    <option value="generic">Общие устройства</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="buttons-container">
+            <button id="scanBtn" class="primary-btn" disabled>
+                Начать сканирование
+            </button>
+            <button id="stopScanBtn" class="danger-btn" disabled>
+                Остановить сканирование
+            </button>
+            <button id="clearDevicesBtn" class="secondary-btn">
+                Очистить список
+            </button>
+        </div>
+
+        <div class="devices-container">
+            <div class="devices-header">
+                <h2>Найденные устройства</h2>
+                <div class="devices-count">
+                    Найдено: <span id="devicesCount">0</span> устройств
+                </div>
+            </div>
+
+            <div id="devicesList" class="devices-list">
+                <div class="empty-state">
+                    <div>📶</div>
+                    <p>Устройства не найдены</p>
+                    <p>Нажмите "Начать сканирование" для поиска Bluetooth устройств</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="log-container">
+            <div class="devices-header">
+                <h3>Журнал событий</h3>
+                <button id="clearLogBtn" style="padding: 5px 10px; font-size: 12px;">Очистить</button>
+            </div>
+            <div id="logEntries"></div>
+        </div>
+    </div>
+
+    <script>
+        // Основные переменные
+        let bluetoothAvailable = false;
+        let isScanning = false;
+        let discoveredDevices = new Map();
+        let logEntries = [];
+        let scanInterval = null;
+        let scanAttempts = 0;
+        const MAX_SCAN_ATTEMPTS = 10;
+
+        // Сервисы Bluetooth для фильтрации
+        const bluetoothServices = {
+            all: [],
+            battery: ['battery_service'],
+            health: [
+                'heart_rate',
+                'health_thermometer',
+                'glucose',
+                'blood_pressure'
+            ],
+            heart_rate: ['heart_rate'],
+            cycling: [
+                'cycling_speed_and_cadence',
+                'cycling_power'
+            ],
+            generic: ['generic_access', 'generic_attribute']
+        };
+
+        // UUID сервисов
+        const serviceUUIDs = {
+            'battery_service': '0000180f-0000-1000-8000-00805f9b34fb',
+            'BLE_MODBUS': '569a1102-b87f-490c-92cb-11ba5ea5167c',
+            'heart_rate': '0000180d-0000-1000-8000-00805f9b34fb',
+            'health_thermometer': '00001809-0000-1000-8000-00805f9b34fb',
+            'glucose': '00001808-0000-1000-8000-00805f9b34fb',
+            'blood_pressure': '00001810-0000-1000-8000-00805f9b34fb',
+            'cycling_speed_and_cadence': '00001816-0000-1000-8000-00805f9b34fb',
+            'cycling_power': '00001818-0000-1000-8000-00805f9b34fb',
+            'generic_access': '00001800-0000-1000-8000-00805f9b34fb',
+            'generic_attribute': '00001801-0000-1000-8000-00805f9b34fb'
+        };
+
+        // DOM элементы
+        const bluetoothStatus = document.getElementById('bluetoothStatus');
+        const scanBtn = document.getElementById('scanBtn');
+        const stopScanBtn = document.getElementById('stopScanBtn');
+        const clearDevicesBtn = document.getElementById('clearDevicesBtn');
+        const clearLogBtn = document.getElementById('clearLogBtn');
+        const devicesList = document.getElementById('devicesList');
+        const devicesCount = document.getElementById('devicesCount');
+        const logEntriesContainer = document.getElementById('logEntries');
+        const serviceFilter = document.getElementById('serviceFilter');
+
+        // Функция для добавления записи в журнал
+        function addLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = {
+                timestamp,
+                message,
+                type
+            };
+            
+            logEntries.push(logEntry);
+            
+            // Ограничиваем количество записей
+            if (logEntries.length > 50) {
+                logEntries.shift();
+            }
+            
+            // Обновляем отображение
+            updateLogDisplay();
+        }
+
+        // Функция для обновления отображения журнала
+        function updateLogDisplay() {
+            logEntriesContainer.innerHTML = '';
+            
+            logEntries.forEach(entry => {
+                const logElement = document.createElement('div');
+                logElement.className = `log-entry log-${entry.type}`;
+                logElement.innerHTML = `
+                    <span class="log-time">[${entry.timestamp}]</span>
+                    <span class="log-message">${entry.message}</span>
+                `;
+                logEntriesContainer.appendChild(logElement);
+            });
+            
+            // Прокручиваем вниз
+            logEntriesContainer.scrollTop = logEntriesContainer.scrollHeight;
+        }
+
+        // Функция для проверки доступности Bluetooth
+        async function checkBluetoothAvailability() {
+            try {
+                if (!navigator.bluetooth) {
+                    throw new Error('Web Bluetooth API не поддерживается в этом браузере');
+                }
+
+                // Проверяем доступность Bluetooth
+                const availability = await navigator.bluetooth.getAvailability();
+                
+                if (availability) {
+                    bluetoothAvailable = true;
+                    bluetoothStatus.textContent = '✅ Bluetooth доступен';
+                    bluetoothStatus.className = 'bluetooth-status status-available';
+                    scanBtn.disabled = false;
+                    addLog('Bluetooth доступен на этом устройстве', 'success');
+                } else {
+                    bluetoothAvailable = false;
+                    bluetoothStatus.textContent = '❌ Bluetooth недоступен на этом устройстве';
+                    bluetoothStatus.className = 'bluetooth-status status-unavailable';
+                    scanBtn.disabled = true;
+                    addLog('Bluetooth недоступен на этом устройстве', 'warning');
+                }
+            } catch (error) {
+                bluetoothAvailable = false;
+                bluetoothStatus.textContent = `❌ Ошибка: ${error.message}`;
+                bluetoothStatus.className = 'bluetooth-status status-unavailable';
+                scanBtn.disabled = true;
+                addLog(`Ошибка проверки Bluetooth: ${error.message}`, 'error');
+            }
+        }
+
+        // Функция для получения UUID сервисов для фильтра
+        function getServiceUUIDs(filter) {
+            const services = bluetoothServices[filter] || [];
+            return services.map(service => serviceUUIDs[service]).filter(uuid => uuid);
+        }
+
+        // Функция для начала сканирования
+        async function startScanning() {
+            if (!bluetoothAvailable || isScanning) return;
+
+            isScanning = true;
+            updateScanningUI();
+            scanAttempts = 0;
+            
+            addLog('Начало сканирования...', 'info');
+            
+            // Запускаем периодическое сканирование
+            scanInterval = setInterval(performScan, 3000);
+            
+            // Сразу выполняем первое сканирование
+            performScan();
+        }
+
+        // Функция для выполнения одного цикла сканирования
+        async function performScan() {
+            if (!isScanning) return;
+            
+            if (scanAttempts >= MAX_SCAN_ATTEMPTS) {
+                addLog('Достигнуто максимальное количество попыток сканирования', 'warning');
+                stopScanning();
+                return;
+            }
+            
+            scanAttempts++;
+            
+            try {
+                const filterValue = serviceFilter.value;
+                const serviceUUIDs = getServiceUUIDs(filterValue);
+                
+                addLog(`Попытка сканирования ${scanAttempts}/${MAX_SCAN_ATTEMPTS} (фильтр: ${filterValue})`, 'info');
+                
+                // Используем requestDevice с фильтрами
+/*                const device = await navigator.bluetooth.requestDevice({
+                    filters: serviceUUIDs.length > 0 ? [{ services: serviceUUIDs }] : [],
+                    optionalServices: serviceUUIDs.length > 0 ? serviceUUIDs : ['battery_service'],
+                    acceptAllDevices: serviceUUIDs.length === 0
+                });
+*/
+                let device = await navigator.bluetooth.requestDevice({
+                    acceptAllDevices: true,
+                    optionalServices: ['569a1102-b87f-490c-92cb-11ba5ea5167c']
+                })
+
+                // Добавляем устройство в список
+                await handleDiscoveredDevice(device);
+                
+            } catch (error) {
+                if (error.name === 'NotFoundError') {
+                    addLog('Устройства не найдены в этом цикле сканирования', 'info');
+                } else if (error.name === 'SecurityError') {
+                    addLog('Доступ к Bluetooth запрещен', 'error');
+                    stopScanning();
+                } else if (error.name === 'NotAllowedError') {
+                    addLog('Сканирование отменено пользователем', 'warning');
+                    stopScanning();
+                } else {
+                    addLog(`Ошибка сканирования: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        // Функция для обработки найденного устройства
+        async function handleDiscoveredDevice(device) {
+            const deviceId = device.id;
+            
+            // Если устройство уже есть в списке, обновляем его
+            if (discoveredDevices.has(deviceId)) {
+                const existingDevice = discoveredDevices.get(deviceId);
+                existingDevice.lastSeen = new Date();
+                existingDevice.device = device;
+                addLog(`Обновлено устройство: ${device.name || 'Unknown'}`, 'info');
+            } else {
+                // Добавляем новое устройство
+                discoveredDevices.set(deviceId, {
+                    id: deviceId,
+                    name: device.name || 'Unknown Device',
+                    device: device,
+                    firstSeen: new Date(),
+                    lastSeen: new Date()
+                });
+                
+                addLog(`Найдено новое устройство: ${device.name || 'Unknown'}`, 'success');
+                updateDevicesList();
+            }
+        }
+
+        // Функция для обновления списка устройств
+        function updateDevicesList() {
+            devicesCount.textContent = discoveredDevices.size;
+            
+            if (discoveredDevices.size === 0) {
+                devicesList.innerHTML = `
+                    <div class="empty-state">
+                        <div>📶</div>
+                        <p>Устройства не найдены</p>
+                        <p>Нажмите "Начать сканирование" для поиска Bluetooth устройств</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Сортируем устройства по времени последнего обнаружения
+            const sortedDevices = Array.from(discoveredDevices.values())
+                .sort((a, b) => b.lastSeen - a.lastSeen);
+            
+            let html = '';
+            
+            sortedDevices.forEach(device => {
+                const lastSeen = formatTimeAgo(device.lastSeen);
+                
+                html += `
+                    <div class="device-item" data-device-id="${device.id}">
+                        <div class="device-info">
+                            <div class="device-name">
+                                <span class="bluetooth-icon"></span>
+                                ${escapeHtml(device.name)}
+                            </div>
+                            <div class="device-id">ID: ${device.id}</div>
+                            <div style="font-size: 11px; color: #999; margin-top: 5px;">
+                                Найдено: ${lastSeen}
+                            </div>
+                        </div>
+                        <button class="connect-btn" onclick="connectToDevice('${device.id}')">
+                            Подключиться
+                        </button>
+                    </div>
+                `;
+            });
+            
+            devicesList.innerHTML = html;
+        }
+
+        // Функция для форматирования времени
+        function formatTimeAgo(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+            
+            if (seconds < 10) return 'только что';
+            if (seconds < 60) return `${seconds} сек. назад`;
+            if (seconds < 3600) return `${Math.floor(seconds / 60)} мин. назад`;
+            return `${Math.floor(seconds / 3600)} ч. назад`;
+        }
+
+        // Функция для остановки сканирования
+        function stopScanning() {
+            if (scanInterval) {
+                clearInterval(scanInterval);
+                scanInterval = null;
+            }
+            
+            isScanning = false;
+            updateScanningUI();
+            addLog('Сканирование остановлено', 'warning');
+        }
+
+        // Функция для обновления UI в зависимости от состояния сканирования
+        function updateScanningUI() {
+            if (isScanning) {
+                bluetoothStatus.textContent = '🔄 Идет сканирование Bluetooth устройств...';
+                bluetoothStatus.className = 'bluetooth-status status-scanning';
+                scanBtn.disabled = true;
+                stopScanBtn.disabled = false;
+                scanBtn.innerHTML = 'Сканирование...';
+            } else {
+                if (bluetoothAvailable) {
+                    bluetoothStatus.textContent = '✅ Bluetooth доступен';
+                    bluetoothStatus.className = 'bluetooth-status status-available';
+                }
+                scanBtn.disabled = !bluetoothAvailable;
+                stopScanBtn.disabled = true;
+                scanBtn.innerHTML = 'Начать сканирование';
+            }
+        }
+
+        // Функция для подключения к устройству
+        async function connectToDevice(deviceId) {
+            const deviceInfo = discoveredDevices.get(deviceId);
+            if (!deviceInfo) return;
+
+            try {
+                addLog(`Попытка подключения к: ${deviceInfo.name}`, 'info');
+                
+                // Показываем индикатор загрузки
+                const connectBtn = document.querySelector(`[data-device-id="${deviceId}"] .connect-btn`);
+                const originalText = connectBtn.textContent;
+                connectBtn.textContent = 'Подключение...';
+                connectBtn.disabled = true;
+
+                // Останавливаем сканирование перед подключением
+                if (isScanning) {
+                    stopScanning();
+                }
+                
+                // Подключаемся к устройству
+                const device = deviceInfo.device;
+                
+                // Устанавливаем обработчики событий
+                device.addEventListener('gattserverdisconnected', onDisconnected);
+                
+                // Подключаемся к GATT серверу
+                const server = await device.gatt.connect();
+                
+                addLog(`Успешно подключено к: ${deviceInfo.name}`, 'success');
+                
+                // Обновляем UI
+                connectBtn.textContent = 'Подключено';
+                connectBtn.style.backgroundColor = '#2ecc71';
+                connectBtn.disabled = true;
+                
+                // Добавляем класс для анимации иконки
+                const deviceItem = connectBtn.closest('.device-item');
+                deviceItem.classList.add('device-connected');
+
+                // Получаем информацию об устройстве
+                const deviceName = await getDeviceName(server);
+                const batteryLevel = await getBatteryLevel(server);
+                
+                // Отображаем информацию об устройстве
+                let infoMessage = `Успешно подключено к устройству:\n\nНазвание: ${deviceInfo.name}`;
+                
+                if (deviceName) {
+                    infoMessage += `\nИмя устройства: ${deviceName}`;
+                }
+                
+                if (batteryLevel !== null) {
+                    infoMessage += `\nУровень батареи: ${batteryLevel}%`;
+                }
+                
+                infoMessage += `\n\nТеперь можно выполнять операции с устройством.`;
+                
+                alert(infoMessage);
+
+                function onDisconnected() {
+                    addLog(`Устройство отключено: ${deviceInfo.name}`, 'warning');
+                    connectBtn.textContent = 'Подключиться';
+                    connectBtn.style.backgroundColor = '';
+                    connectBtn.disabled = false;
+                    deviceItem.classList.remove('device-connected');
+                    device.removeEventListener('gattserverdisconnected', onDisconnected);
+                }
+
+            } catch (error) {
+                addLog(`Ошибка подключения к ${deviceInfo.name}: ${error.message}`, 'error');
+                
+                // Восстанавливаем кнопку
+                const connectBtn = document.querySelector(`[data-device-id="${deviceId}"] .connect-btn`);
+                if (connectBtn) {
+                    connectBtn.textContent = 'Ошибка';
+                    connectBtn.style.backgroundColor = '#e74c3c';
+                    
+                    setTimeout(() => {
+                        connectBtn.textContent = 'Подключиться';
+                        connectBtn.style.backgroundColor = '';
+                        connectBtn.disabled = false;
+                    }, 2000);
+                }
+            }
+        }
+
+        // Функция для получения имени устройства
+        async function getDeviceName(server) {
+            try {
+                const service = await server.getPrimaryService('generic_access');
+                const characteristic = await service.getCharacteristic('gap.device_name');
+                const value = await characteristic.readValue();
+                const decoder = new TextDecoder('utf-8');
+                return decoder.decode(value);
+            } catch (error) {
+                return null;
+            }
+        }
+
+        // Функция для получения уровня батареи
+        async function getBatteryLevel(server) {
+            try {
+                const service = await server.getPrimaryService('battery_service');
+                const characteristic = await service.getCharacteristic('battery_level');
+                const value = await characteristic.readValue();
+                return value.getUint8(0);
+            } catch (error) {
+                return null;
+            }
+        }
+
+        // Функция для очистки списка устройств
+        function clearDevicesList() {
+            discoveredDevices.clear();
+            updateDevicesList();
+            addLog('Список устройств очищен', 'warning');
+        }
+
+        // Функция для очистки журнала
+        function clearLog() {
+            logEntries = [];
+            updateLogDisplay();
+        }
+
+        // Функция для экранирования HTML
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', async () => {
+            addLog('Инициализация Bluetooth сканера...', 'info');
+            
+            // Назначаем обработчики событий
+            scanBtn.addEventListener('click', startScanning);
+            stopScanBtn.addEventListener('click', stopScanning);
+            clearDevicesBtn.addEventListener('click', clearDevicesList);
+            clearLogBtn.addEventListener('click', clearLog);
+            
+            // Проверяем доступность Bluetooth
+            await checkBluetoothAvailability();
+            
+            // Обновляем статус доступности при изменении
+            if (navigator.bluetooth) {
+                navigator.bluetooth.addEventListener('availabilitychanged', (event) => {
+                    bluetoothAvailable = event.value;
+                    checkBluetoothAvailability();
+                });
+            }
+            
+            addLog('Приложение готово к работе', 'success');
+        });
+
+        // Обработка отключения устройства при закрытии страницы
+        window.addEventListener('beforeunload', () => {
+            stopScanning();
+        });
+    </script>
+</body>
+</html>

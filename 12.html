@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Web BLE</title>
+	<style>
+		body {
+			display: grid;
+			max-width: 500px;
+			margin: auto;
+		}
+
+		button {
+			min-height: 50px;
+			font-size: 20px;
+		}
+
+		textarea {
+			font-family: monospace;
+			font-size: 15px;
+		}
+	</style>
+	<script>
+		'use strict'
+
+		//Характеристика для передачи
+		let RXcharacteristic;
+
+
+		//Вывод сообщения на страницу
+		function log(l) {
+			loglist.value += l + '\n';
+			loglist.scrollTop = loglist.scrollHeight;
+		}
+
+
+		//Передать информацию
+		async function send(data) {
+			try {
+				await RXcharacteristic.writeValueWithoutResponse(
+					new Uint8Array(data)
+				);
+				let s = '';
+				for (let i of data) {
+					s += i.toString(16) + ' '
+				}
+				log(`Передано: ${s}`)
+			} catch (error) {
+				log(`Ошибка:   ${error}`)
+			}
+		}//send
+
+
+		//Получение информации
+		function receive(event) {
+			let value = event.target.value;
+			value = value.buffer ? value : new DataView(value);
+
+			let data = [];
+			//Представление данных в виде массива
+			for (let i = 0; i < value.byteLength; i++) {
+				data[i] = value.getUint8(i);
+			}
+
+			let s = '';
+			for (let i of data) {
+				s += i.toString(16) + ' '
+			}
+			log(`Получено: ${s}`);
+
+			//если получено 20 байт -- извлечь температуру
+			if (data.length == 20)
+				temp.innerHTML = `Температура: ${data[8]}°C`
+
+		}//receive
+
+		//подключение
+		async function connect() {
+			try {
+				log('Запрос Bluetooth Device...');
+
+				let device = await navigator.bluetooth.requestDevice({
+					acceptAllDevices: true,
+					optionalServices: ['569a1102-b87f-490c-92cb-11ba5ea5167c']//Сервис UART
+				});
+
+				log('Подключение GATT Server...');
+				let server = await device.gatt.connect();
+
+				log('Получение Nordic UART Service...');
+				let service = await server.getPrimaryService('569a1102-b87f-490c-92cb-11ba5ea5167c');
+
+				log('Получение TX Characteristic...');
+				let TXcharacteristic = await service.getCharacteristic('569a3000-b87f-490c-92cb-11ba5ea5167c');
+
+				log('Подписка...');
+				let Notification = await TXcharacteristic.startNotifications();
+
+				log('Подключение обработчика...');
+				Notification.addEventListener('characteristicvaluechanged', receive);
+
+				log('Получение RX Characteristic...');
+				RXcharacteristic = await service.getCharacteristic('569a3001-b87f-490c-92cb-11ba5ea5167c');
+
+				log('Инициализация...');
+				send([0x7F, 0x03, 0x00, 0x00, 0x00, 0x06, 0xCF, 0xD6]);
+			} catch (error) {
+				log(`Ошибка:   ${error}`);
+			}
+		}//connect
+	</script>
+</head>
+
+<body>
+	<button onclick="connect()">Подключиться</button>
+	<button onclick="send([0x7F, 0x03, 0x00, 0x00, 0x00, 0x06, 0xCF, 0xD6])">Инициализация</button>
+	<button onclick="send([0x55, 0x01, 0x03, 0xaa])">Включить</button>
+	<button onclick="send([0x55, 0x01, 0x04, 0xaa])">Выключить</button>
+	<button onclick="send([0x7F, 0x03, 0x00, 0x00, 0x00, 0x06, 0xCF, 0xD6])">Обновить информацию</button>
+	<button onclick="loglist.value = ``">Очистить лог</button>
+	<textarea id="loglist" rows="15"></textarea>
+	<label id="temp"></label>
+</body>
+
+</html>

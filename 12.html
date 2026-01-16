@@ -4,90 +4,749 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Web BLE</title>
+	<title>Web BLE Controller</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+		}
+
+		:root {
+			--primary: #4361ee;
+			--primary-dark: #3a56d4;
+			--secondary: #7209b7;
+			--success: #4cc9f0;
+			--danger: #f72585;
+			--warning: #f8961e;
+			--light: #f8f9fa;
+			--dark: #212529;
+			--gray: #6c757d;
+			--light-gray: #e9ecef;
+			--border-radius: 12px;
+			--box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+			--transition: all 0.3s ease;
+		}
+
 		body {
+			background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+			min-height: 100vh;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			padding: 20px;
+			color: var(--dark);
+		}
+
+		.container {
+			width: 100%;
+			max-width: 850px;
+			background: white;
+			border-radius: var(--border-radius);
+			box-shadow: var(--box-shadow);
+			overflow: hidden;
+		}
+
+		.header {
+			background: linear-gradient(to right, var(--primary), var(--secondary));
+			color: white;
+			padding: 25px 30px;
+			text-align: center;
+		}
+
+		.header h1 {
+			font-size: 28px;
+			margin-bottom: 8px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 12px;
+		}
+
+		.header p {
+			opacity: 0.9;
+			font-size: 16px;
+		}
+
+		.content {
+			padding: 30px;
+		}
+
+		.status-panel {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			background: var(--light-gray);
+			padding: 20px;
+			border-radius: var(--border-radius);
+			margin-bottom: 25px;
+		}
+
+		.connection-status {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+		}
+
+		.status-indicator {
+			width: 14px;
+			height: 14px;
+			border-radius: 50%;
+			background: var(--gray);
+			transition: var(--transition);
+		}
+
+		.status-indicator.connected {
+			background: var(--success);
+			box-shadow: 0 0 10px var(--success);
+		}
+
+		.status-indicator.disconnected {
+			background: var(--danger);
+			animation: pulse 2s infinite;
+		}
+
+		@keyframes pulse {
+			0% {
+				opacity: 1;
+			}
+
+			50% {
+				opacity: 0.5;
+			}
+
+			100% {
+				opacity: 1;
+			}
+		}
+
+		.temperature-display {
+			background: linear-gradient(to right, #4cc9f0, #4361ee);
+			color: white;
+			padding: 15px 25px;
+			border-radius: var(--border-radius);
+			font-size: 22px;
+			font-weight: 600;
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			transition: var(--transition);
+		}
+
+		.controls {
 			display: grid;
-			max-width: 500px;
-			margin: auto;
+			grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+			gap: 18px;
+			margin-bottom: 30px;
 		}
 
-		button {
-			min-height: 50px;
-			font-size: 20px;
+		.btn {
+			padding: 18px 15px;
+			border: none;
+			border-radius: var(--border-radius);
+			font-size: 16px;
+			font-weight: 600;
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 10px;
+			transition: var(--transition);
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 		}
 
-		textarea {
-			font-family: monospace;
-			font-size: 15px;
+		.btn:hover {
+			transform: translateY(-3px);
+			box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+		}
+
+		.btn:active {
+			transform: translateY(0);
+		}
+
+		.btn:disabled {
+			opacity: 0.6;
+			cursor: not-allowed;
+			transform: none !important;
+		}
+
+		.btn-primary {
+			background: var(--primary);
+			color: white;
+		}
+
+		.btn-primary:hover:not(:disabled) {
+			background: var(--primary-dark);
+		}
+
+		.btn-success {
+			background: var(--success);
+			color: white;
+		}
+
+		.btn-success:hover:not(:disabled) {
+			background: #3ab5d9;
+		}
+
+		.btn-danger {
+			background: var(--danger);
+			color: white;
+		}
+
+		.btn-danger:hover:not(:disabled) {
+			background: #e11570;
+		}
+
+		.btn-warning {
+			background: var(--warning);
+			color: white;
+		}
+
+		.btn-warning:hover:not(:disabled) {
+			background: #e08515;
+		}
+
+		.btn-light {
+			background: var(--light-gray);
+			color: var(--dark);
+		}
+
+		.btn-light:hover:not(:disabled) {
+			background: #dde1e4;
+		}
+
+		.btn-disconnect {
+			background: linear-gradient(to right, #ff6b6b, #ff4757);
+			color: white;
+		}
+
+		.btn-disconnect:hover:not(:disabled) {
+			background: linear-gradient(to right, #ff4757, #ff3742);
+		}
+
+		.log-container {
+			background: var(--light);
+			border-radius: var(--border-radius);
+			padding: 20px;
+			margin-top: 20px;
+		}
+
+		.log-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 15px;
+		}
+
+		.log-header h3 {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			color: var(--dark);
+		}
+
+		#loglist {
+			width: 100%;
+			height: 250px;
+			padding: 15px;
+			background: #1a1a2e;
+			color: #e2e2e2;
+			border: none;
+			border-radius: 8px;
+			font-family: 'Consolas', 'Monaco', monospace;
+			font-size: 14px;
+			line-height: 1.5;
+			resize: none;
+			overflow-y: auto;
+			white-space: pre-wrap;
+		}
+
+		.log-entry {
+			margin-bottom: 5px;
+			padding: 5px 0;
+			border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+		}
+
+		.log-time {
+			color: #4cc9f0;
+		}
+
+		.log-success {
+			color: #4ade80;
+		}
+
+		.log-error {
+			color: #f87171;
+		}
+
+		.log-receive {
+			color: #fbbf24;
+		}
+
+		.log-send {
+			color: #60a5fa;
+		}
+
+		.log-warning {
+			color: #fbbf24;
+		}
+
+		.footer {
+			text-align: center;
+			padding: 20px;
+			color: var(--gray);
+			font-size: 14px;
+			border-top: 1px solid var(--light-gray);
+			margin-top: 20px;
+		}
+
+		.device-info {
+			background: var(--light);
+			padding: 15px;
+			border-radius: var(--border-radius);
+			margin-bottom: 20px;
+			font-size: 14px;
+			display: none;
+			border-left: 4px solid var(--primary);
+		}
+
+		.device-info.active {
+			display: block;
+			animation: slideIn 0.3s ease;
+		}
+
+		@keyframes slideIn {
+			from {
+				opacity: 0;
+				transform: translateY(-10px);
+			}
+
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		.connection-controls {
+			display: flex;
+			gap: 15px;
+			margin-bottom: 25px;
+		}
+
+		.connection-controls .btn {
+			flex: 1;
+		}
+
+		@media (max-width: 768px) {
+			.controls {
+				grid-template-columns: repeat(2, 1fr);
+			}
+
+			.connection-controls {
+				flex-direction: column;
+			}
+
+			.status-panel {
+				flex-direction: column;
+				gap: 15px;
+				align-items: flex-start;
+			}
+
+			.content {
+				padding: 20px;
+			}
+		}
+
+		@media (max-width: 480px) {
+			.controls {
+				grid-template-columns: 1fr;
+			}
+
+			.btn {
+				padding: 16px;
+			}
+
+			.header h1 {
+				font-size: 24px;
+			}
+		}
+
+		.connection-stats {
+			background: var(--light);
+			padding: 15px;
+			border-radius: var(--border-radius);
+			margin-top: 15px;
+			display: none;
+		}
+
+		.connection-stats.active {
+			display: block;
+		}
+
+		.stats-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+			gap: 15px;
+			margin-top: 10px;
+		}
+
+		.stat-item {
+			background: white;
+			padding: 10px;
+			border-radius: 8px;
+			border-left: 4px solid var(--primary);
 		}
 	</style>
+</head>
+
+<body>
+	<div class="container">
+		<div class="header">
+			<h1><i class="fab fa-bluetooth"></i></i> Web BLE Controller</h1>
+			<p>Управление Bluetooth Low Energy устройством через браузер</p>
+		</div>
+
+		<div class="content">
+			<div class="device-info" id="deviceInfo">
+				<div><strong><i class="fas fa-microchip"></i> Устройство:</strong> <span id="deviceName">Не
+						подключено</span></div>
+				<div><strong><i class="fas fa-cogs"></i> Сервис:</strong> Nordic UART Service</div>
+				<div><strong><i class="fas fa-info-circle"></i> Статус:</strong> <span id="connectionText">Ожидание
+						подключения</span></div>
+				<div><strong><i class="fas fa-clock"></i> Время подключения:</strong> <span
+						id="connectionTime">--:--:--</span></div>
+			</div>
+
+			<div class="connection-controls">
+				<button class="btn btn-primary" id="connectBtn" onclick="connect()">
+					<i class="fas fa-link"></i> Подключиться
+				</button>
+
+				<button class="btn btn-disconnect" id="disconnectBtn" onclick="disconnectDevice()" disabled>
+					<i class="fas fa-unlink"></i> Отключиться
+				</button>
+			</div>
+
+			<div class="status-panel">
+				<div class="connection-status">
+					<div class="status-indicator" id="statusIndicator"></div>
+					<div>
+						<strong id="statusText">Не подключено</strong>
+						<div id="statusSubtext">Нажмите "Подключиться" для начала работы</div>
+					</div>
+				</div>
+
+				<div class="temperature-display" id="tempDisplay">
+					<i class="fas fa-thermometer-half"></i>
+					<span id="temp">-- °C</span>
+				</div>
+			</div>
+
+			<div class="controls">
+				<button class="btn btn-success" onclick="send([0x55, 0x01, 0x03, 0xaa])" id="powerOnBtn" disabled>
+					<i class="fas fa-power-off"></i> Включить
+				</button>
+
+				<button class="btn btn-danger" onclick="send([0x55, 0x01, 0x04, 0xaa])" id="powerOffBtn" disabled>
+					<i class="fas fa-power-off"></i> Выключить
+				</button>
+
+				<button class="btn btn-warning" onclick="send([0x7F, 0x03, 0x00, 0x00, 0x00, 0x06, 0xCF, 0xD6])"
+					id="refreshBtn" disabled>
+					<i class="fas fa-sync-alt"></i> Обновить
+				</button>
+
+				<button class="btn btn-light" onclick="loglist.value = ''">
+					<i class="fas fa-trash-alt"></i> Очистить лог
+				</button>
+
+				<button class="btn btn-light" onclick="exportLog()">
+					<i class="fas fa-download"></i> Экспорт лога
+				</button>
+			</div>
+
+			<div class="connection-stats" id="connectionStats">
+				<div class="stats-grid">
+					<div class="stat-item">
+						<div class="stat-label"><i class="fas fa-exchange-alt"></i> Отправлено команд:</div>
+						<div class="stat-value" id="sentCommands">0</div>
+					</div>
+					<div class="stat-item">
+						<div class="stat-label"><i class="fas fa-download"></i> Получено пакетов:</div>
+						<div class="stat-value" id="receivedPackets">0</div>
+					</div>
+					<div class="stat-item">
+						<div class="stat-label"><i class="fas fa-clock"></i> Время работы:</div>
+						<div class="stat-value" id="uptime">00:00:00</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="log-container">
+				<div class="log-header">
+					<h3><i class="fas fa-history"></i> Журнал событий</h3>
+					<div class="log-counter">
+						Записей: <span id="logCount">0</span>
+					</div>
+				</div>
+				<textarea id="loglist" readonly></textarea>
+			</div>
+		</div>
+
+		<div class="footer">
+			<p>Web BLE Controller &copy; 2023 | Работает на Web Bluetooth API</p>
+			<p>Требуется браузер с поддержкой Web Bluetooth (Chrome/Edge)</p>
+		</div>
+	</div>
+
 	<script>
 		'use strict'
 
-		//Характеристика для передачи
+		// Характеристика для передачи
 		let RXcharacteristic;
+		let connectedDevice = null;
+		let connectedServer = null;
+		let logEntries = 0;
+		let sentCommands = 0;
+		let receivedPackets = 0;
+		let connectionStartTime = null;
+		let uptimeInterval = null;
 
-
-		//Вывод сообщения на страницу
-		function log(l) {
-			loglist.value += l + '\n';
-			loglist.scrollTop = loglist.scrollHeight;
+		// Обновление счетчика логов
+		function updateLogCount() {
+			document.getElementById('logCount').textContent = logEntries;
 		}
 
+		// Обновление статистики
+		function updateStats() {
+			document.getElementById('sentCommands').textContent = sentCommands;
+			document.getElementById('receivedPackets').textContent = receivedPackets;
+		}
 
-		//Передать информацию
+		// Обновление времени работы
+		function updateUptime() {
+			if (!connectionStartTime) return;
+
+			const now = new Date();
+			const diff = now - connectionStartTime;
+			const hours = Math.floor(diff / 3600000);
+			const minutes = Math.floor((diff % 3600000) / 60000);
+			const seconds = Math.floor((diff % 60000) / 1000);
+
+			document.getElementById('uptime').textContent =
+				`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+		}
+
+		// Вывод сообщения на страницу с цветовым кодированием
+		function log(message, type = 'info') {
+			const now = new Date();
+			const timestamp = now.toTimeString().split(' ')[0];
+			const dateStr = now.toLocaleDateString();
+
+			let logLine = `[${dateStr} ${timestamp}] `;
+
+			switch (type) {
+				case 'success':
+					logLine += `✓ ${message}`;
+					break;
+				case 'error':
+					logLine += `✗ ${message}`;
+					break;
+				case 'warning':
+					logLine += `⚠ ${message}`;
+					break;
+				case 'receive':
+					logLine += `↓ ${message}`;
+					receivedPackets++;
+					updateStats();
+					break;
+				case 'send':
+					logLine += `↑ ${message}`;
+					sentCommands++;
+					updateStats();
+					break;
+				default:
+					logLine += `${message}`;
+			}
+
+			loglist.value += logLine + '\n';
+			loglist.scrollTop = loglist.scrollHeight;
+			logEntries++;
+			updateLogCount();
+		}
+
+		// Обновление статуса подключения
+		function updateConnectionStatus(connected, deviceName = null) {
+			const indicator = document.getElementById('statusIndicator');
+			const statusText = document.getElementById('statusText');
+			const statusSubtext = document.getElementById('statusSubtext');
+			const deviceInfo = document.getElementById('deviceInfo');
+			const deviceNameSpan = document.getElementById('deviceName');
+			const connectionText = document.getElementById('connectionText');
+			const connectBtn = document.getElementById('connectBtn');
+			const disconnectBtn = document.getElementById('disconnectBtn');
+			const powerOnBtn = document.getElementById('powerOnBtn');
+			const powerOffBtn = document.getElementById('powerOffBtn');
+			const refreshBtn = document.getElementById('refreshBtn');
+			const connectionStats = document.getElementById('connectionStats');
+			const connectionTime = document.getElementById('connectionTime');
+
+			if (connected) {
+				// Обновление UI для состояния "подключено"
+				indicator.className = 'status-indicator connected';
+				statusText.textContent = 'Подключено';
+				statusSubtext.textContent = deviceName ? `Устройство: ${deviceName}` : 'Устройство подключено';
+				deviceInfo.classList.add('active');
+				deviceNameSpan.textContent = deviceName || 'BLE устройство';
+				connectionText.textContent = 'Активно';
+				connectionText.style.color = 'var(--success)';
+
+				// Обновление времени подключения
+				const now = new Date();
+				connectionTime.textContent = now.toLocaleTimeString();
+				connectionStartTime = now;
+
+				// Включение/отключение кнопок
+				connectBtn.disabled = true;
+				disconnectBtn.disabled = false;
+				powerOnBtn.disabled = false;
+				powerOffBtn.disabled = false;
+				refreshBtn.disabled = false;
+
+				// Показать статистику
+				connectionStats.classList.add('active');
+
+				// Запустить таймер времени работы
+				if (uptimeInterval) clearInterval(uptimeInterval);
+				uptimeInterval = setInterval(updateUptime, 1000);
+
+			} else {
+				// Обновление UI для состояния "отключено"
+				indicator.className = 'status-indicator disconnected';
+				statusText.textContent = 'Не подключено';
+				statusSubtext.textContent = 'Нажмите "Подключиться" для начала работы';
+				deviceInfo.classList.remove('active');
+				connectionText.textContent = 'Отключено';
+				connectionText.style.color = 'var(--gray)';
+				connectionTime.textContent = '--:--:--';
+
+				// Включение/отключение кнопок
+				connectBtn.disabled = false;
+				disconnectBtn.disabled = true;
+				powerOnBtn.disabled = true;
+				powerOffBtn.disabled = true;
+				refreshBtn.disabled = true;
+
+				// Скрыть статистику
+				connectionStats.classList.remove('active');
+
+				// Остановить таймер времени работы
+				if (uptimeInterval) {
+					clearInterval(uptimeInterval);
+					uptimeInterval = null;
+				}
+
+				// Сброс времени работы
+				connectionStartTime = null;
+				document.getElementById('uptime').textContent = '00:00:00';
+			}
+		}
+
+		// Передать информацию
 		async function send(data) {
+			if (!RXcharacteristic || !connectedDevice) {
+				log('Ошибка: не подключено к устройству', 'error');
+				return;
+			}
+
 			try {
 				await RXcharacteristic.writeValueWithoutResponse(
 					new Uint8Array(data)
 				);
-				let s = '';
-				for (let i of data) {
-					s += i.toString(16) + ' '
-				}
-				log(`Передано: ${s}`)
+				let hexString = data.map(b => b.toString(16).padStart(2, '0')).join(' ');
+				log(`Отправка данных: ${hexString}`, 'send');
 			} catch (error) {
-				log(`Ошибка:   ${error}`)
+				log(`Ошибка отправки: ${error}`, 'error');
+				// Если ошибка отправки, возможно устройство отключилось
+				if (error.toString().includes('disconnected') || error.toString().includes('not connected')) {
+					handleDisconnection();
+				}
 			}
-		}//send
+		}
 
-
-		//Получение информации
+		// Получение информации
 		function receive(event) {
 			let value = event.target.value;
 			value = value.buffer ? value : new DataView(value);
 
 			let data = [];
-			//Представление данных в виде массива
+			// Представление данных в виде массива
 			for (let i = 0; i < value.byteLength; i++) {
 				data[i] = value.getUint8(i);
 			}
 
-			let s = '';
-			for (let i of data) {
-				s += i.toString(16) + ' '
+			let hexString = data.map(b => b.toString(16).padStart(2, '0')).join(' ');
+			log(`Получение данных: ${hexString}`, 'receive');
+
+			// Если получено 20 байт -- извлечь температуру
+			if (data.length == 20) {
+				const tempElement = document.getElementById('temp');
+				tempElement.innerHTML = `${data[8]}°C`;
+				tempElement.style.animation = 'none';
+				setTimeout(() => {
+					tempElement.style.animation = 'pulse 0.5s';
+				}, 10);
+
+				// Анимация изменения температуры
+				document.getElementById('tempDisplay').style.background =
+					`linear-gradient(to right, ${getTemperatureColor(data[8])}, var(--primary))`;
 			}
-			log(`Получено: ${s}`);
+		}
 
-			//если получено 20 байт -- извлечь температуру
-			if (data.length == 20)
-				temp.innerHTML = `Температура: ${data[8]}°C`
+		// Получение цвета в зависимости от температуры
+		function getTemperatureColor(temp) {
+			if (temp < 10) return '#4cc9f0'; // Холодно - голубой
+			if (temp < 25) return '#4ade80'; // Нормально - зеленый
+			if (temp < 35) return '#fbbf24'; // Тепло - желтый
+			return '#f87171'; // Горячо - красный
+		}
 
-		}//receive
-
-		//подключение
+		// Подключение
 		async function connect() {
 			try {
-				log('Запрос Bluetooth Device...');
+				log('Запрос Bluetooth устройства...');
+				updateConnectionStatus(false);
 
-				let device = await navigator.bluetooth.requestDevice({
-					acceptAllDevices: true,
-					optionalServices: ['569a1102-b87f-490c-92cb-11ba5ea5167c']//Сервис UART
-				});
+				// Используем фильтр по имени, если знаем имя устройства
+				let device;
+				try {
+					device = await navigator.bluetooth.requestDevice({
+						acceptAllDevices: true,
+						optionalServices: ['569a1102-b87f-490c-92cb-11ba5ea5167c']
+					});
+				} catch (e) {
+					// Если фильтр по имени не сработал, пробуем acceptAllDevices
+					log('Фильтр по имени не сработал, пробуем общий поиск...', 'warning');
+					device = await navigator.bluetooth.requestDevice({
+						acceptAllDevices: true,
+						optionalServices: ['569a1102-b87f-490c-92cb-11ba5ea5167c']
+					});
+				}
 
-				log('Подключение GATT Server...');
+				connectedDevice = device;
+				log(`Устройство выбрано: ${device.name || 'Безымянное'}`, 'success');
+
+				log('Подключение к GATT серверу...');
 				let server = await device.gatt.connect();
+				connectedServer = server;
+
+				// Обработчик отключения
+				device.addEventListener('gattserverdisconnected', () => {
+					log('Устройство отключилось', 'warning');
+					handleDisconnection();
+				});
 
 				log('Получение Nordic UART Service...');
 				let service = await server.getPrimaryService('569a1102-b87f-490c-92cb-11ba5ea5167c');
@@ -95,33 +754,129 @@
 				log('Получение TX Characteristic...');
 				let TXcharacteristic = await service.getCharacteristic('569a3000-b87f-490c-92cb-11ba5ea5167c');
 
-				log('Подписка...');
-				let Notification = await TXcharacteristic.startNotifications();
+				log('Подписка на уведомления...');
+				await TXcharacteristic.startNotifications();
 
-				log('Подключение обработчика...');
-				Notification.addEventListener('characteristicvaluechanged', receive);
+				log('Подключение обработчика получения данных...');
+				TXcharacteristic.addEventListener('characteristicvaluechanged', receive);
 
 				log('Получение RX Characteristic...');
 				RXcharacteristic = await service.getCharacteristic('569a3001-b87f-490c-92cb-11ba5ea5167c');
 
-				log('Инициализация...');
-				send([0x7F, 0x03, 0x00, 0x00, 0x00, 0x06, 0xCF, 0xD6]);
-			} catch (error) {
-				log(`Ошибка:   ${error}`);
-			}
-		}//connect
-	</script>
-</head>
+				log('Подключение успешно установлено!', 'success');
+				updateConnectionStatus(true, device.name || 'BLE устройство');
 
-<body>
-	<button onclick="connect()">Подключиться</button>
-	<button onclick="send([0x7F, 0x03, 0x00, 0x00, 0x00, 0x06, 0xCF, 0xD6])">Инициализация</button>
-	<button onclick="send([0x55, 0x01, 0x03, 0xaa])">Включить</button>
-	<button onclick="send([0x55, 0x01, 0x04, 0xaa])">Выключить</button>
-	<button onclick="send([0x7F, 0x03, 0x00, 0x00, 0x00, 0x06, 0xCF, 0xD6])">Обновить информацию</button>
-	<button onclick="loglist.value = ``">Очистить лог</button>
-	<textarea id="loglist" rows="15"></textarea>
-	<label id="temp"></label>
+				// Автоматическая инициализация после подключения
+				setTimeout(() => {
+					log('Автоматическая инициализация устройства...');
+					send([0x7F, 0x03, 0x00, 0x00, 0x00, 0x06, 0xCF, 0xD6]);
+				}, 500);
+
+			} catch (error) {
+				log(`Ошибка подключения: ${error}`, 'error');
+				updateConnectionStatus(false);
+			}
+		}
+
+		// Функция отключения устройства
+		async function disconnectDevice() {
+			if (!connectedDevice) {
+				log('Нет активного подключения для отключения', 'warning');
+				return;
+			}
+
+			try {
+				log('Инициировано отключение устройства...', 'warning');
+
+				// Отключиться от устройства
+				if (connectedDevice.gatt.connected) {
+					connectedDevice.gatt.disconnect();
+				}
+
+				handleDisconnection();
+				log('Устройство успешно отключено', 'success');
+
+			} catch (error) {
+				log(`Ошибка при отключении: ${error}`, 'error');
+			}
+		}
+
+		// Обработка отключения
+		function handleDisconnection() {
+			log('Обработка отключения устройства...', 'warning');
+
+			// Сброс всех переменных
+			RXcharacteristic = null;
+			connectedDevice = null;
+			connectedServer = null;
+
+			// Обновление UI
+			updateConnectionStatus(false);
+
+			// Сброс температуры
+			document.getElementById('temp').innerHTML = '-- °C';
+			document.getElementById('tempDisplay').style.background = 'linear-gradient(to right, #4cc9f0, #4361ee)';
+
+			// Сброс статистики отправки/получения (но не общего счетчика логов)
+			sentCommands = 0;
+			receivedPackets = 0;
+			updateStats();
+		}
+
+		// Экспорт лога
+		function exportLog() {
+			if (!loglist.value.trim()) {
+				log('Лог пуст, нечего экспортировать', 'error');
+				return;
+			}
+
+			const blob = new Blob([loglist.value], { type: 'text/plain' });
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = `ble-log-${new Date().toISOString().slice(0, 10)}-${new Date().getHours()}${new Date().getMinutes()}.txt`;
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+			URL.revokeObjectURL(url);
+
+			log('Лог экспортирован в файл', 'success');
+		}
+
+		// Инициализация при загрузке
+		document.addEventListener('DOMContentLoaded', function () {
+			updateLogCount();
+			updateStats();
+
+			// Проверка поддержки Web Bluetooth
+			if (!navigator.bluetooth) {
+				log('Ваш браузер не поддерживает Web Bluetooth API', 'error');
+				alert('Web Bluetooth не поддерживается в вашем браузере. Пожалуйста, используйте Chrome или Edge.');
+
+				// Блокировка всех кнопок если нет поддержки
+				document.getElementById('connectBtn').disabled = true;
+				document.getElementById('disconnectBtn').disabled = true;
+			}
+
+			// Анимация для температуры
+			const style = document.createElement('style');
+			style.textContent = `
+                @keyframes pulse {
+                    0% { transform: scale(1); }
+                    50% { transform: scale(1.05); }
+                    100% { transform: scale(1); }
+                }
+                
+                .btn-disconnect:disabled {
+                    background: linear-gradient(to right, #ffa8a8, #ff9f9f) !important;
+                }
+            `;
+			document.head.appendChild(style);
+
+			// Инициализация статуса
+			updateConnectionStatus(false);
+		});
+	</script>
 </body>
 
 </html>

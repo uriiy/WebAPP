@@ -774,6 +774,7 @@
 
 			} catch (error) {
 				log(`Ошибка подключения: ${error}`, 'error');
+				disconnectDevice();
 				updateConnectionStatus(false);
 			}
 		}

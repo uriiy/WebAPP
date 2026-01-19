@@ -9,7 +9,7 @@
 		"*.c": "c",
 	},
 	"cortex-debug.variableUseNaturalFormat": true,
-	"terminal.integrated.cwd": "./armgcc",
+	// "terminal.integrated.cwd": "./armgcc",
 	"files.exclude": {
 		"**/.git": true,
 		"*.gitignore": true

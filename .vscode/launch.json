@@ -1,27 +1,33 @@
 {
-    // Используйте IntelliSense, чтобы узнать о возможных атрибутах.
-    // Наведите указатель мыши, чтобы просмотреть описания существующих атрибутов.
-    // Для получения дополнительной информации посетите: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Launch Chrome",
-            "request": "launch",
-            "type": "chrome",
-            "url": "http://localhost:8080",
-            "webRoot": "${workspaceFolder}"
-        },
-        {
-            "type": "msedge",
-            "request": "launch",
-            "name": "Open deepseek_html_20260114_73fa65 (1).html",
-            "file": "c:\\siam\\projects\\.test\\deepseek_html_20260114_73fa65 (1).html"
-        },
-        {
-            "type": "msedge",
-            "request": "launch",
-            "name": "12.html",
-            "file": "c:\\siam\\projects\\.test\\12.html"
-        }
-    ]
+	// Используйте IntelliSense, чтобы узнать о возможных атрибутах.
+	// Наведите указатель мыши, чтобы просмотреть описания существующих атрибутов.
+	// Для получения дополнительной информации посетите: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Launch Chrome",
+			"request": "launch",
+			"type": "chrome",
+			"url": "http://localhost:8080",
+			"webRoot": "${workspaceFolder}"
+		},
+		{
+			"type": "msedge",
+			"request": "launch",
+			"name": "Open deepseek_html_20260114_73fa65 (1).html",
+			"file": "c:\\siam\\projects\\.test\\deepseek_html_20260114_73fa65 (1).html"
+		},
+		{
+			"type": "msedge",
+			"request": "launch",
+			"name": "12.html",
+			"file": "c:\\siam\\projects\\.test\\12.html"
+		},
+		{
+			"type": "msedge",
+			"request": "launch",
+			"name": "deepseek_html_20260119_ca02cc.html",
+			"file": "c:\\siam\\projects\\.test\\deepseek_html_20260119_ca02cc.html"
+		}
+	]
 }

@@ -14,20 +14,20 @@
 		{
 			"type": "msedge",
 			"request": "launch",
-			"name": "Open deepseek_html_20260114_73fa65 (1).html",
-			"file": "c:\\siam\\projects\\.test\\deepseek_html_20260114_73fa65 (1).html"
+			"name": "BDF Audio Player.html",
+			"file": "${workspaceRoot}/BDF Audio Player.html"
 		},
 		{
 			"type": "msedge",
 			"request": "launch",
-			"name": "12.html",
-			"file": "c:\\siam\\projects\\.test\\12.html"
+			"name": "Bluetooth Сканер устройств.html",
+			"file": "${workspaceRoot}/Bluetooth Сканер устройств.html"
 		},
 		{
 			"type": "msedge",
 			"request": "launch",
-			"name": "deepseek_html_20260119_ca02cc.html",
-			"file": "c:\\siam\\projects\\.test\\deepseek_html_20260119_ca02cc.html"
+			"name": "Web BLE Controller.html",
+			"file": "${workspaceRoot}/Web BLE Controller.html"
 		}
 	]
 }

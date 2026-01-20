@@ -447,7 +447,7 @@
 					<i class="fas fa-sync-alt"></i> Обновить
 				</button>
 
-				<button class="btn btn-light" onclick="loglist.value = ''">
+				<button class="btn btn-light" onclick="log_clr()">
 					<i class="fas fa-trash-alt"></i> Очистить лог
 				</button>
 
@@ -563,6 +563,12 @@
 			loglist.value += logLine + '\n';
 			loglist.scrollTop = loglist.scrollHeight;
 			logEntries++;
+			updateLogCount();
+		}
+
+		function log_clr() {
+			loglist.value = '';
+			logEntries = 0;
 			updateLogCount();
 		}
 

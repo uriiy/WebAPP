@@ -304,17 +304,23 @@
 
 		.device-info {
 			background: var(--light-gray);
-			padding: 12px;
+			padding: 16px;
 			border-radius: var(--border-radius);
 			margin-bottom: 12px;
 			font-size: 14px;
 			border-left: 4px solid var(--primary);
+
+			/* Сетка 2x2 */
+			display: grid;
+			grid-template-columns: repeat(2, 1fr);
+			grid-template-rows: repeat(2, auto);
+			/* gap: 12px; */
 		}
 
-		.device-info.active {
+		/* .device-info.active {
 			display: block;
 			animation: slideIn 0.3s ease;
-		}
+		} */
 
 		@keyframes slideIn {
 			from {
@@ -453,23 +459,23 @@
 			<div class="connection-stats" id="connectionStats">
 				<div class="stats-grid">
 					<div class="stat-item">
-						<div class="stat-label"><i class="fas fa-exchange-alt"></i> Отправлено команд:</div>
-						<div class="stat-value" id="sentCommands">0</div>
+						<span class="stat-label"><i class="fas fa-exchange-alt"></i> Отправлено команд:</span>
+						<span id="sentCommands">0</span>
 					</div>
 					<div class="stat-item">
-						<div class="stat-label"><i class="fas fa-download"></i> Получено пакетов:</div>
-						<div class="stat-value" id="receivedPackets">0</div>
+						<span class="stat-label"><i class="fas fa-download"></i> Получено пакетов:</span>
+						<span class="stat-value" id="receivedPackets">0</span>
 					</div>
 					<div class="stat-item">
-						<div class="stat-label"><i class="fas fa-clock"></i> Время работы:</div>
-						<div class="stat-value" id="uptime">00:00:00</div>
+						<span class="stat-label"><i class="fas fa-clock"></i> Время работы:</span>
+						<span class="stat-value" id="uptime">00:00:00</span>
 					</div>
 				</div>
 			</div>
 
 			<div class="log-container">
 				<div class="log-header">
-					<h3><i class="fas fa-history"></i> Журнал событий</h3>
+					<div><i class="fas fa-history"></i> Журнал событий</div>
 					<div class="log-counter">
 						Записей: <span id="logCount">0</span>
 					</div>
@@ -664,15 +670,15 @@
 			let hexString = data.map(b => b.toString(16).padStart(2, '0')).join(' ');
 			log(`Получение данных: ${hexString}`, 'receive');
 
-			// Если получено 20 байт -- извлечь температуру
-			if (data.length == 20) {
-				const tempElement = document.getElementById('temp');
-				tempElement.innerHTML = `${data[8]}°C`;
-				tempElement.style.animation = 'none';
-				setTimeout(() => {
-					tempElement.style.animation = 'pulse 0.5s';
-				}, 10);
-			}
+			// // Если получено 20 байт -- извлечь температуру
+			// if (data.length == 20) {
+			// 	const tempElement = document.getElementById('temp');
+			// 	tempElement.innerHTML = `${data[8]}°C`;
+			// 	tempElement.style.animation = 'none';
+			// 	setTimeout(() => {
+			// 		tempElement.style.animation = 'pulse 0.5s';
+			// 	}, 10);
+			// }
 		}
 
 		// Получение цвета в зависимости от температуры

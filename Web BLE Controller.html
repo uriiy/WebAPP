@@ -36,7 +36,7 @@
 			display: flex;
 			justify-content: center;
 			align-items: center;
-			padding: 20px;
+			padding: 12px;
 			color: var(--dark);
 		}
 
@@ -52,7 +52,7 @@
 		.header {
 			background: linear-gradient(to right, var(--primary), var(--secondary));
 			color: white;
-			padding: 25px 30px;
+			padding: 12px 15px;
 			text-align: center;
 		}
 
@@ -71,7 +71,7 @@
 		}
 
 		.content {
-			padding: 30px;
+			padding: 12px;
 		}
 
 		.status-panel {
@@ -79,9 +79,9 @@
 			justify-content: space-between;
 			align-items: center;
 			background: var(--light-gray);
-			padding: 20px;
+			padding: 12px;
 			border-radius: var(--border-radius);
-			margin-bottom: 25px;
+			margin-bottom: 12px;
 		}
 
 		.connection-status {
@@ -125,25 +125,25 @@
 		.temperature-display {
 			background: linear-gradient(to right, #4cc9f0, #4361ee);
 			color: white;
-			padding: 15px 25px;
+			padding: 12px 15px;
 			border-radius: var(--border-radius);
 			font-size: 22px;
 			font-weight: 600;
 			display: flex;
 			align-items: center;
-			gap: 12px;
+			gap: 10px;
 			transition: var(--transition);
 		}
 
 		.controls {
 			display: grid;
-			grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-			gap: 18px;
-			margin-bottom: 30px;
+			grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+			gap: 10px;
+			margin-bottom: 10px;
 		}
 
 		.btn {
-			padding: 18px 15px;
+			padding: 12px 15px;
 			border: none;
 			border-radius: var(--border-radius);
 			font-size: 16px;
@@ -227,17 +227,17 @@
 		}
 
 		.log-container {
-			background: var(--light);
+			background: var(--light-gray);
 			border-radius: var(--border-radius);
-			padding: 20px;
-			margin-top: 20px;
+			padding: 12px;
+			margin-top: 12px;
 		}
 
 		.log-header {
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
-			margin-bottom: 15px;
+			margin-bottom: 12px;
 		}
 
 		.log-header h3 {
@@ -250,7 +250,7 @@
 		#loglist {
 			width: 100%;
 			height: 250px;
-			padding: 15px;
+			padding: 12px;
 			background: #1a1a2e;
 			color: #e2e2e2;
 			border: none;
@@ -295,20 +295,19 @@
 
 		.footer {
 			text-align: center;
-			padding: 20px;
+			padding: 12px;
 			color: var(--gray);
 			font-size: 14px;
 			border-top: 1px solid var(--light-gray);
-			margin-top: 20px;
+			margin-top: 12px;
 		}
 
 		.device-info {
-			background: var(--light);
-			padding: 15px;
+			background: var(--light-gray);
+			padding: 12px;
 			border-radius: var(--border-radius);
-			margin-bottom: 20px;
+			margin-bottom: 12px;
 			font-size: 14px;
-			display: none;
 			border-left: 4px solid var(--primary);
 		}
 
@@ -332,7 +331,7 @@
 		.connection-controls {
 			display: flex;
 			gap: 15px;
-			margin-bottom: 25px;
+			margin-bottom: 12px;
 		}
 
 		.connection-controls .btn {
@@ -355,7 +354,7 @@
 			}
 
 			.content {
-				padding: 20px;
+				padding: 12px;
 			}
 		}
 
@@ -365,7 +364,7 @@
 			}
 
 			.btn {
-				padding: 16px;
+				padding: 12px;
 			}
 
 			.header h1 {
@@ -375,10 +374,8 @@
 
 		.connection-stats {
 			background: var(--light);
-			padding: 15px;
 			border-radius: var(--border-radius);
-			margin-top: 15px;
-			display: none;
+			margin-top: 12px;
 		}
 
 		.connection-stats.active {
@@ -388,13 +385,13 @@
 		.stats-grid {
 			display: grid;
 			grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-			gap: 15px;
-			margin-top: 10px;
+			gap: 12px;
+			margin-top: 12px;
 		}
 
 		.stat-item {
-			background: white;
-			padding: 10px;
+			background: var(--light-gray);
+			padding: 12px;
 			border-radius: 8px;
 			border-left: 4px solid var(--primary);
 		}
@@ -404,21 +401,11 @@
 <body>
 	<div class="container">
 		<div class="header">
-			<h1><i class="fab fa-bluetooth"></i></i> Web BLE Controller</h1>
+			<h2><i class="fab fa-bluetooth"></i></i> Web BLE Controller</h2>
 			<p>Управление Bluetooth Low Energy устройством через браузер</p>
 		</div>
 
 		<div class="content">
-			<div class="device-info" id="deviceInfo">
-				<div><strong><i class="fas fa-microchip"></i> Устройство:</strong> <span id="deviceName">Не
-						подключено</span></div>
-				<div><strong><i class="fas fa-cogs"></i> Сервис:</strong> Nordic UART Service</div>
-				<div><strong><i class="fas fa-info-circle"></i> Статус:</strong> <span id="connectionText">Ожидание
-						подключения</span></div>
-				<div><strong><i class="fas fa-clock"></i> Время подключения:</strong> <span
-						id="connectionTime">--:--:--</span></div>
-			</div>
-
 			<div class="connection-controls">
 				<button class="btn btn-primary" id="connectBtn" onclick="connect()">
 					<i class="fas fa-link"></i> Подключиться
@@ -429,18 +416,14 @@
 				</button>
 			</div>
 
-			<div class="status-panel">
-				<div class="connection-status">
-					<div class="status-indicator" id="statusIndicator"></div>
-					<div>
-						<strong id="statusText">Не подключено</strong>
-						<div id="statusSubtext">Нажмите "Подключиться" для начала работы</div>
-					</div>
-				</div>
-
-				<div class="temperature-display" id="tempDisplay">
-					<i class="fas fa-thermometer-half"></i>
-					<span id="temp">-- °C</span>
+			<div class="device-info" id="deviceInfo">
+				<div><strong><i class="fas fa-microchip"></i> Устройство:</strong> <span id="deviceName">Не
+						подключено</span></div>
+				<div><strong><i class="fas fa-cogs"></i> Сервис:</strong> Nordic UART Service</div>
+				<div><strong><i class="fas fa-info-circle"></i> Статус:</strong> <span id="connectionText">Ожидание
+						подключения</span></div>
+				<div><strong><i class="fas fa-clock"></i> Время подключения:</strong> <span
+						id="connectionTime">--:--:--</span>
 				</div>
 			</div>
 
@@ -579,9 +562,6 @@
 
 		// Обновление статуса подключения
 		function updateConnectionStatus(connected, deviceName = null) {
-			const indicator = document.getElementById('statusIndicator');
-			const statusText = document.getElementById('statusText');
-			const statusSubtext = document.getElementById('statusSubtext');
 			const deviceInfo = document.getElementById('deviceInfo');
 			const deviceNameSpan = document.getElementById('deviceName');
 			const connectionText = document.getElementById('connectionText');
@@ -595,9 +575,6 @@
 
 			if (connected) {
 				// Обновление UI для состояния "подключено"
-				indicator.className = 'status-indicator connected';
-				statusText.textContent = 'Подключено';
-				statusSubtext.textContent = deviceName ? `Устройство: ${deviceName}` : 'Устройство подключено';
 				deviceInfo.classList.add('active');
 				deviceNameSpan.textContent = deviceName || 'BLE устройство';
 				connectionText.textContent = 'Активно';
@@ -624,9 +601,6 @@
 
 			} else {
 				// Обновление UI для состояния "отключено"
-				indicator.className = 'status-indicator disconnected';
-				statusText.textContent = 'Не подключено';
-				statusSubtext.textContent = 'Нажмите "Подключиться" для начала работы';
 				deviceInfo.classList.remove('active');
 				connectionText.textContent = 'Отключено';
 				connectionText.style.color = 'var(--gray)';
@@ -698,10 +672,6 @@
 				setTimeout(() => {
 					tempElement.style.animation = 'pulse 0.5s';
 				}, 10);
-
-				// Анимация изменения температуры
-				document.getElementById('tempDisplay').style.background =
-					`linear-gradient(to right, ${getTemperatureColor(data[8])}, var(--primary))`;
 			}
 		}
 
@@ -723,11 +693,24 @@
 				let device;
 				try {
 					device = await navigator.bluetooth.requestDevice({
-						acceptAllDevices: true,
+						filters: [
+							{ namePrefix: "CM_" },
+							{ namePrefix: "PM_" },
+							{ namePrefix: "BL_" },
+							{ namePrefix: "SIA" },
+							{ namePrefix: "sia" },
+							{ namePrefix: "DMT" },
+							{ namePrefix: "DDI" },
+							{ namePrefix: "SID" },
+							{ namePrefix: "DU" },
+							{ namePrefix: "DUA" },
+							{ namePrefix: "UMT" },
+						],
 						optionalServices: ['569a1102-b87f-490c-92cb-11ba5ea5167c']
 					});
 				} catch (e) {
 					// Если фильтр по имени не сработал, пробуем acceptAllDevices
+					log(e.message, 'error');
 					log('Фильтр по имени не сработал, пробуем общий поиск...', 'warning');
 					device = await navigator.bluetooth.requestDevice({
 						acceptAllDevices: true,
@@ -813,10 +796,6 @@
 
 			// Обновление UI
 			updateConnectionStatus(false);
-
-			// Сброс температуры
-			document.getElementById('temp').innerHTML = '-- °C';
-			document.getElementById('tempDisplay').style.background = 'linear-gradient(to right, #4cc9f0, #4361ee)';
 
 			// Сброс статистики отправки/получения (но не общего счетчика логов)
 			sentCommands = 0;

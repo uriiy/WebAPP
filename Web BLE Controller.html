@@ -56,9 +56,8 @@
 			text-align: center;
 		}
 
-		.header h1 {
-			font-size: 28px;
-			margin-bottom: 8px;
+		.header h2 {
+			font-size: 25px;
 			display: flex;
 			align-items: center;
 			justify-content: center;
@@ -234,7 +233,6 @@
 			background: var(--light-gray);
 			border-radius: var(--border-radius);
 			padding: 12px;
-			margin-top: 12px;
 		}
 
 		.log-header {
@@ -303,7 +301,6 @@
 			color: var(--gray);
 			font-size: 14px;
 			border-top: 1px solid var(--light-gray);
-			margin-top: 10px;
 		}
 
 		.device-info {
@@ -396,7 +393,7 @@
 			display: grid;
 			grid-template-columns: repeat(2, 1fr);
 			gap: 12px;
-			margin-top: 12px;
+			margin-bottom: 12px;
 		}
 
 		.stat-item {
@@ -416,7 +413,7 @@
 	<div class="container">
 		<div class="header">
 			<h2><i class="fab fa-bluetooth"></i></i> Web BLE Controller</h2>
-			<p>Управление Bluetooth Low Energy устройством через браузер</p>
+			<p>Управление BLE устройством через браузер</p>
 		</div>
 
 		<div class="content">
@@ -431,8 +428,7 @@
 			</div>
 
 			<div class="device-info" id="deviceInfo">
-				<div><strong><i class="fas fa-microchip"></i> Устройство:</strong> <span id="deviceName">Не
-						подключено</span></div>
+				<div><strong><i class="fas fa-microchip"></i> Устройство:</strong> <span id="deviceName"> -</span></div>
 				<div><strong><i class="fas fa-cogs"></i> Сервис:</strong> NUS</div>
 				<div><strong><i class="fas fa-info-circle"></i> Статус:</strong> <span id="connectionText">Ожидание
 						подключения</span></div>

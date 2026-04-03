@@ -1,7 +1,7 @@
 <HTML>
 
 <HEAD>
-	<TITLE>BDF Audio Player - Астанин 10-12-2025</TITLE>
+	<TITLE>BDF Audio Player v2 - 03-04-2026</TITLE>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<style type="text/css">
@@ -935,14 +935,12 @@
 			res = findSequence(data, arr);
 			if (res > 0) {
 				res += arr.length;
-				if ((data[res + 3] == 0x3d) && (data[res + 5] == 4)) {
+				if ((data[res + 3] == 0x3d) && (data[res + 5] == 2)) {
 					var buffer = new ArrayBuffer(4);
 					var uint8View = new Uint8Array(buffer);
 					uint8View[0] = data[res + 7];
 					uint8View[1] = data[res + 8];
-					uint8View[2] = data[res + 9];
-					uint8View[3] = data[res + 10];
-					var f = new Float32Array(buffer);
+					var f = new Uint16Array(buffer);
 					res = f[0];
 				} else {
 					res = -1;
@@ -1026,8 +1024,13 @@
 			res = findSequence(data, arr);
 			if (res > 0) {
 				res += arr.length;
-				if ((data[res + 3] == 0x3d) && (data[res + 5] == 4)) {
-					res = ((data[res + 7]) << 0) + ((data[res + 8]) << 8) + ((data[res + 9]) << 16) + ((data[res + 10]) << 24);
+				if ((data[res + 3] == 0x3d) && (data[res + 5] == 2)) {
+					var buffer = new ArrayBuffer(4);
+					var uint8View = new Uint8Array(buffer);
+					uint8View[0] = data[res + 7];
+					uint8View[1] = data[res + 8];
+					var f = new Uint16Array(buffer);
+					res = f[0];
 				} else {
 					res = -1;
 				}
@@ -1045,8 +1048,13 @@
 			res = findSequence(data, arr);
 			if (res > 0) {
 				res += arr.length;
-				if ((data[res + 3] == 0x3d) && (data[res + 5] == 4)) {
-					res = ((data[res + 7]) << 0) + ((data[res + 8]) << 8) + ((data[res + 9]) << 16) + ((data[res + 10]) << 24);
+				if ((data[res + 3] == 0x3d) && (data[res + 5] == 2)) {
+					var buffer = new ArrayBuffer(4);
+					var uint8View = new Uint8Array(buffer);
+					uint8View[0] = data[res + 7];
+					uint8View[1] = data[res + 8];
+					var f = new Uint16Array(buffer);
+					res = f[0];
 				} else {
 					res = -1;
 				}
